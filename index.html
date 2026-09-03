@@ -1234,11 +1234,18 @@ function renderAddPage(){
   renderCatsDisplay();
   populateGroupSel();
   const qg=document.getElementById('quick-grid');
-  if(qg) qg.innerHTML=DB.presets.map(p=>`
-    <button class="pbtn" onclick="fillPreset('${p.desc}','${p.cat}',${p.amt},'${p.type}')">
-      <div class="pbtn-n">${getCat(p.cat).icon} ${p.desc}</div>
-      <div class="pbtn-m">${fmtM(p.amt)} · ${getCat(p.cat).name}</div>
-    </button>`).join('');
+  if(qg) qg.innerHTML=DB.presets.map((p,i)=>`
+    <div style="position:relative">
+      <button class="pbtn" style="width:100%;padding-right:22px" onclick="fillPreset('${p.desc}','${p.cat}',${p.amt},'${p.type}')">
+        <div class="pbtn-n">${getCat(p.cat).icon} ${p.desc}</div>
+        <div class="pbtn-m">${fmtM(p.amt)} · ${getCat(p.cat).name}</div>
+      </button>
+      <button onclick="delPreset(${i})" title="ลบ"
+        style="position:absolute;top:4px;right:4px;background:var(--rd2);border:none;
+        color:var(--rd);border-radius:50%;width:18px;height:18px;font-size:11px;
+        cursor:pointer;display:flex;align-items:center;justify-content:center;
+        font-family:inherit;padding:0;line-height:1">×</button>
+    </div>`).join('');
 }
 
 window.setType=(t,el,ctx='')=>{
@@ -1384,6 +1391,12 @@ window.addPresetPrompt=async()=>{
   DB.presets.push({desc,cat,amt,type:'expense'});
   await saveSetting('presets',{list:DB.presets});
   renderAddPage();toast('✅ เพิ่มรายการด่วนแล้ว');
+};
+window.delPreset=async i=>{
+  if(!confirm(`ลบ "${DB.presets[i]?.desc}" ออกจากรายการด่วน?`))return;
+  DB.presets.splice(i,1);
+  await saveSetting('presets',{list:DB.presets});
+  renderAddPage();toast('ลบรายการด่วนแล้ว');
 };
 
 // ══ RECORDS ════════════════════════════════════
